@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ajouter un produit</title>
+  </head>
+  <body>
+    <h1>Ajouter un produit</h1>
+    <form method="post" action="/add-product">
+      <label>Nom :</label><br />
+      <input type="text" name="name" /><br />
+
+      <label>Prix :</label><br />
+      <input type="number" step="0.01" name="price" /><br />
+
+      <label>Quantité :</label><br />
+      <input type="number" name="quantity" /><br /><br />
+
+      <button type="submit">Ajouter</button>
+    </form>
+  </body>
+</html>
