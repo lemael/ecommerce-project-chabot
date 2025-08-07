@@ -21,4 +21,6 @@ WORKDIR /app
 COPY --from=backend-builder /app/out .
 ENV ASPNETCORE_URLS=http://*:$PORT
 EXPOSE $PORT
+
 ENTRYPOINT ["dotnet", "EcommerceChatbot.dll"]
+
