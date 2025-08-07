@@ -161,3 +161,4 @@
 /home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/runtimes/win-x64/native/e_sqlite3.dll
 /home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/runtimes/win-x86/native/e_sqlite3.dll
 /home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
+/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/obj/Debug/net8.0/EcommerceChatbot.sourcelink.json
