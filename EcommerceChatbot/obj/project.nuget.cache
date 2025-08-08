@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "MyL2R5UUqvPFJESqrC9oanUF4/8sxTYL4+udZXwpfF4zqyZEsOU9DFEQ2G/CD4f8MGlprj5kkfxQM2MskXXojg==",
+  "dgSpecHash": "AO2Bj/ReapnYWmU5grmYnJMnGMiG999Z37SRVf5sUdhfGPQHD9Y0C+3erJNpW4wnQ4Iumms3AqDVUwa2Oy5Ogw==",
   "success": true,
   "projectFilePath": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/EcommerceChatbot.csproj",
   "expectedPackageFiles": [
@@ -44,6 +44,8 @@
     "/home/mael/.nuget/packages/microsoft.extensions.primitives/9.0.8/microsoft.extensions.primitives.9.0.8.nupkg.sha512",
     "/home/mael/.nuget/packages/microsoft.openapi/1.6.14/microsoft.openapi.1.6.14.nupkg.sha512",
     "/home/mael/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
+    "/home/mael/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
+    "/home/mael/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
     "/home/mael/.nuget/packages/openai/2.3.0/openai.2.3.0.nupkg.sha512",
     "/home/mael/.nuget/packages/openai-dotnet/8.8.1/openai-dotnet.8.8.1.nupkg.sha512",
     "/home/mael/.nuget/packages/sqlitepclraw.bundle_e_sqlite3/2.1.10/sqlitepclraw.bundle_e_sqlite3.2.1.10.nupkg.sha512",
