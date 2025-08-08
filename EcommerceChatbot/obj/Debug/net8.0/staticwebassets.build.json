@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "0UduKxe5eJ56kUU9TEZevILmWosHmg5SZTqbDSRVbrc=",
+  "Hash": "QVDm81uIv1f9Ku4huxNB0YuqTtvlGTmWv2BdxdFEyvM=",
   "Source": "EcommerceChatbot",
   "BasePath": "_content/EcommerceChatbot",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "EcommerceChatbot/wwwroot",
+      "Source": "EcommerceChatbot",
+      "ContentRoot": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/wwwroot/",
+      "BasePath": "_content/EcommerceChatbot",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/wwwroot/add-product.html",
+      "SourceId": "EcommerceChatbot",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/wwwroot/",
+      "BasePath": "_content/EcommerceChatbot",
+      "RelativePath": "add-product.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/add-product.html"
+    }
+  ]
 }

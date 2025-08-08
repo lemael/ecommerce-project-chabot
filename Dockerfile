@@ -10,6 +10,8 @@ WORKDIR /src
 COPY EcommerceChatbot/ .
 RUN dotnet publish -c Release -o /app/out
 
+# Après COPY --from=backend /app/out .
+#RUN dotnet ef database update --no-build
 # Étape 3 : Image finale
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
@@ -23,5 +25,8 @@ COPY --from=backend /app/out .
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Ports et commande
-EXPOSE 10000
+# Configuration des ports
+ENV ASPNETCORE_URLS=http://*:8080 
+EXPOSE 8080 
+
 CMD service nginx start && dotnet EcommerceChatbot.dll

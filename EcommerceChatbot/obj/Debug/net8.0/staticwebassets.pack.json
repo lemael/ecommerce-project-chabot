@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/wwwroot/add-product.html",
+      "PackagePath": "staticwebassets/add-product.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.EcommerceChatbot.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.EcommerceChatbot.props",
+      "PackagePath": "build\\EcommerceChatbot.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.EcommerceChatbot.props",
+      "PackagePath": "buildMultiTargeting\\EcommerceChatbot.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.EcommerceChatbot.props",
+      "PackagePath": "buildTransitive\\EcommerceChatbot.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

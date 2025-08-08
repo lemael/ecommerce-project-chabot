@@ -17,7 +17,7 @@ const ChatBot: React.FC = () => {
     setMessages((prev) => [...prev, { text: question, sender: "user" }]);
 
     try {
-      const response = await axios.post("http://localhost:5045/api/chatbot", {
+      const response = await axios.post("http://localhost:8080/api/chatbot", {
         question,
       });
 

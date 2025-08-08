@@ -41,15 +41,27 @@ builder.Services.AddCors(options =>
 builder.WebHost.UseUrls("http://*:8080");
 var app = builder.Build();
 
+// --- Application des migrations automatiquement ---
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 app.MapControllers();
+
 app.UseHttpsRedirection();
-app.Use(async (context, next) => 
+app.Use(async (context, next) =>
 {
     Console.WriteLine($"Requête reçue : {context.Request.Path}");
     await next();
@@ -74,6 +86,14 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 app.UseStaticFiles();
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
 app.MapGet("/form", async () =>
 {
     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "add-product.html");
@@ -83,17 +103,16 @@ app.MapGet("/form", async () =>
 
 app.MapPost("/add-product", async (HttpRequest request, ApplicationDbContext db) =>
 {
-    var form = await request.ReadFormAsync();
-    var name = form["name"];
-   if (!decimal.TryParse(form["price"], out decimal price))
-{
-    return Results.BadRequest("Prix invalide");
-}
+   var form = await request.ReadFormAsync();
+   var name = form["name"];
+   var price = decimal.Parse(form["price"]);
+   var quantity = int.Parse(form["quantity"]);
+    
+   if (string.IsNullOrWhiteSpace(name) || price <= 0 || quantity < 0)
+    {
+        return Results.BadRequest("Données invalides");
+    }
 
-if (!int.TryParse(form["quantity"], out int quantity))
-{
-    return Results.BadRequest("Quantité invalide");
-}
     var product = new Product
     {
         Name = name,
