@@ -24,7 +24,7 @@ builder.Services.AddHttpClient<OpenRouterService>();
 /*
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=products.db"));*/
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 /*
 builder.Services.AddCors(options =>
@@ -112,7 +112,7 @@ app.MapGet("/products", async (ApplicationDbContext db) =>
     return Results.Ok(products);
 });
 app.MapGet("/api/products", () => new { message = "Test réussi" });
-app.MapGet("/debug", async (AppDbContext db) => 
+app.MapGet("/debug", async (ApplicationDbContext db) => 
 {
     try {
         return Results.Ok(new {
