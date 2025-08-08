@@ -27,7 +27,7 @@ public class ChatBotController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.Question))
         {
-            return BadRequest("La question ne peut pas être vide.");
+            return BadRequest("Die Frage kann nicht leer sein.");
         }
         try
         {
@@ -36,10 +36,10 @@ public class ChatBotController : ControllerBase
 
             // Construire la liste produits dans le prompt
             string productList = string.Join("\n", products.Select(p =>
-                $"{p.Name} : prix {p.Price}€, quantité {p.Quantity}"));
+               $"{p.Name}: Preis {p.Price}€, Menge {p.Quantity}"));
 
             // Construire le prompt complet avec les produits + question
-            string prompt = $"Voici la liste des produits:\n{productList}\nRéponds à la question suivante : {request.Question}";
+          string prompt = $"Hier ist die Liste der Produkte:\n{productList}\nBeantworte die folgende Frage: {request.Question}";
 
             var result = await _openRouterService.GetResponseAsync(prompt);
             Console.WriteLine("Réponse finale du bot : " + result);

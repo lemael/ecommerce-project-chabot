@@ -23,6 +23,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpClient<OpenRouterService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=products.db"));
+/*
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -33,7 +34,7 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
+*/
 
 var app = builder.Build();
 
