@@ -1,26 +1,27 @@
-# Étape 1 - Build du frontend React
-FROM node:18-alpine as frontend-builder
+# Étape 1 : Build du frontend
+FROM node:18 as frontend
 WORKDIR /app
-COPY ecommerce-frontend/package.json .
-RUN npm install --silent
-COPY ecommerce-frontend .
-RUN npm run build
+COPY ecommerce-frontend/ .
+RUN npm install && npm run build
 
-# Étape 2 - Build du backend .NET
-FROM mcr.microsoft.com/dotnet/sdk:8.0 as backend-builder
-WORKDIR /app
-COPY EcommerceChatbot/EcommerceChatbot.csproj .
-RUN dotnet restore
-COPY EcommerceChatbot .
-COPY --from=frontend-builder /app/build ./www
-RUN dotnet publish -c Release -o out /p:EnvironmentName=Production
+# Étape 2 : Build du backend .NET
+FROM mcr.microsoft.com/dotnet/sdk:8.0 as backend
+WORKDIR /src
+COPY EcommerceChatbot/ .
+RUN dotnet publish -c Release -o /app/out
 
-# Étape 3 - Runtime
+# Étape 3 : Image finale
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=backend-builder /app/out .
-ENV ASPNETCORE_URLS=http://*:$PORT
-EXPOSE $PORT
 
-ENTRYPOINT ["dotnet", "EcommerceChatbot.dll"]
+# Installer NGINX et dépendances
+RUN apt-get update && apt-get install -y nginx
 
+# Copier les artefacts
+COPY --from=frontend /app/build /var/www/html
+COPY --from=backend /app/out .
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Ports et commande
+EXPOSE 10000
+CMD service nginx start && dotnet EcommerceChatbot.dll

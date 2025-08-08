@@ -21,8 +21,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHttpClient<OpenRouterService>();
+/*
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=products.db"));
+    options.UseSqlite("Data Source=products.db"));*/
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 /*
 builder.Services.AddCors(options =>
 {
@@ -35,7 +38,7 @@ builder.Services.AddCors(options =>
         });
 });
 */
-
+builder.WebHost.UseUrls("http://*:8080");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,7 +49,11 @@ if (app.Environment.IsDevelopment())
 }
 app.MapControllers();
 app.UseHttpsRedirection();
-
+app.Use(async (context, next) => 
+{
+    Console.WriteLine($"Requête reçue : {context.Request.Path}");
+    await next();
+});
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -69,7 +76,7 @@ app.MapGet("/weatherforecast", () =>
 app.UseStaticFiles();
 app.MapGet("/form", async () =>
 {
-    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "www", "add-product.html");
+    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "add-product.html");
     var html = await File.ReadAllTextAsync(filePath);
     return Results.Content(html, "text/html");
 });
@@ -98,7 +105,19 @@ app.MapGet("/products", async (ApplicationDbContext db) =>
     var products = await db.Products.ToListAsync();
     return Results.Ok(products);
 });
-
+app.MapGet("/api/products", () => new { message = "Test réussi" });
+app.MapGet("/debug", async (AppDbContext db) => 
+{
+    try {
+        return Results.Ok(new {
+            dbStatus = await db.Database.CanConnectAsync(),
+            tables = db.Model.GetEntityTypes().Select(e => e.GetTableName())
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
 app.UseCors("AllowFrontend");
 app.UseCors();
 app.Run();
