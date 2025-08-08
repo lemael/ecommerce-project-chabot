@@ -85,9 +85,15 @@ app.MapPost("/add-product", async (HttpRequest request, ApplicationDbContext db)
 {
     var form = await request.ReadFormAsync();
     var name = form["name"];
-    var price = decimal.Parse(form["price"]);
-    var quantity = int.Parse(form["quantity"]);
+   if (!decimal.TryParse(form["price"], out decimal price))
+{
+    return Results.BadRequest("Prix invalide");
+}
 
+if (!int.TryParse(form["quantity"], out int quantity))
+{
+    return Results.BadRequest("Quantité invalide");
+}
     var product = new Product
     {
         Name = name,
