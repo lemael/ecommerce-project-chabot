@@ -24,6 +24,11 @@ builder.Services.AddHttpClient<OpenRouterService>();
 /*
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=products.db"));*/
+builder.Configuration
+    .AddEnvironmentVariables();
+// Vérifier ce que Render lit comme chaîne de connexion
+Console.WriteLine("DefaultConnection: " + builder.Configuration.GetConnectionString("DefaultConnection"));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 /*
@@ -39,6 +44,7 @@ builder.Services.AddCors(options =>
 });
 */
 builder.WebHost.UseUrls("http://*:8080");
+
 var app = builder.Build();
 
 // --- Application des migrations automatiquement ---
