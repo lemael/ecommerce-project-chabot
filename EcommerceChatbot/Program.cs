@@ -7,22 +7,22 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Charger les variables d'environnement depuis .env si présent
+// Charger les variables d'environnement
 DotNetEnv.Env.Load();
 
-// Add services to the container.
+// Configuration des services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-// Configuration CORS unique
+// Configuration CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(
-                "http://localhost:3000",                   // Développement local
-                "https://ecommerce-project-2kvd.onrender.com"  // Production Render
+                "http://localhost:3000",
+                "https://ecommerce-project-2kvd.onrender.com"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -34,7 +34,6 @@ builder.Services.AddHttpClient<OpenRouterService>();
 // Configuration de la base de données
 builder.Configuration.AddEnvironmentVariables();
 
-// Debug: Affiche la configuration de connexion
 var connectionString = Environment.GetEnvironmentVariable("DefaultConnection") 
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -58,18 +57,16 @@ try
         options.EnableSensitiveDataLogging();
         options.LogTo(Console.WriteLine, LogLevel.Information);
     });
-    
-    Console.WriteLine("Configuration DbContext réussie");
 }
 catch (Exception ex) 
 {
-    Console.WriteLine($"ERREUR DE CONFIGURATION : {ex}");
+    Console.WriteLine($"ERREUR DE CONFIGURATION DB: {ex}");
     throw;
 }
 
 var app = builder.Build();
 
-// --- Application des migrations automatiquement ---
+// Application des migrations
 using (var scope = app.Services.CreateScope())
 {
     try 
@@ -79,13 +76,10 @@ using (var scope = app.Services.CreateScope())
         {
             Console.WriteLine("Application des migrations...");
             db.Database.Migrate();
-            Console.WriteLine("Migrations appliquées avec succès");
         }
         
         if (!db.Database.CanConnect())
             throw new Exception("Échec de connexion à la base de données");
-        
-        Console.WriteLine("Connexion DB vérifiée");
     }
     catch (Exception ex)
     {
@@ -94,23 +88,17 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// Pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
 
-// Middlewares dans le bon ordre
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseCors(); // Doit être après UseRouting et avant UseAuthorization
+app.UseCors();
 app.UseAuthorization();
 
 // Endpoints
@@ -130,38 +118,33 @@ app.MapGet("/debug", async (ApplicationDbContext db) =>
 });
 
 // Gestion des produits
-app.MapGet("/products", async (ApplicationDbContext db) =>
-{
-    var products = await db.Products.ToListAsync();
-    return Results.Ok(products);
-});
+app.MapGet("/products", async (ApplicationDbContext db) => 
+    await db.Products.ToListAsync());
 
 app.MapPost("/add-product", async (HttpRequest request, ApplicationDbContext db) =>
 {
     var form = await request.ReadFormAsync();
-    var name = form["name"];
-    var price = decimal.Parse(form["price"]);
-    var quantity = int.Parse(form["quantity"]);
-    
-    if (string.IsNullOrWhiteSpace(name) || price <= 0 || quantity < 0)
-    {
-        return Results.BadRequest("Données invalides");
-    }
-
     var product = new Product
     {
-        Name = name,
-        Price = price,
-        Quantity = quantity
+        Name = form["name"],
+        Price = decimal.Parse(form["price"]),
+        Quantity = int.Parse(form["quantity"])
     };
-
+    
     db.Products.Add(product);
     await db.SaveChangesAsync();
-
     return Results.Ok("Produit ajouté !");
 });
 
-// Démarrer l'application
+// Gestion dynamique du port
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-Console.WriteLine($"Démarrage de l'application sur le port {port}");
-app.Run($"http://0.0.0.0:{port}");
+try
+{
+    app.Run($"http://0.0.0.0:{port}");
+    Console.WriteLine($"Application démarrée sur le port {port}");
+}
+catch (IOException ex) when (ex.InnerException is System.Net.Sockets.SocketException se && se.ErrorCode == 98)
+{
+    Console.WriteLine($"Le port {port} est occupé, tentative avec port aléatoire...");
+    app.Run($"http://0.0.0.0:0"); // 0 = port aléatoire
+}
