@@ -2,8 +2,11 @@ using EcommerceChatbot.Data;
 using EcommerceChatbot.Services;
 using Microsoft.EntityFrameworkCore;
 using EcommerceChatbot.Models;
-
+using DotNetEnv;
 var builder = WebApplication.CreateBuilder(args);
+
+// Charger les variables d'environnement depuis .env si présent
+DotNetEnv.Env.Load();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -29,8 +32,13 @@ builder.Configuration
 // Vérifier ce que Render lit comme chaîne de connexion
 Console.WriteLine("DefaultConnection: " + builder.Configuration.GetConnectionString("DefaultConnection"));
 
+// Utilisation de la connexion
+var connectionString =
+    Environment.GetEnvironmentVariable("DefaultConnection") ??
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 /*
 builder.Services.AddCors(options =>
 {

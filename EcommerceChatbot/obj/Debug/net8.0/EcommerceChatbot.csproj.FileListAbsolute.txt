@@ -165,3 +165,5 @@
 /home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/EcommerceChatbot.staticwebassets.runtime.json
 /home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/Npgsql.dll
 /home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/DotNetEnv.dll
+/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/bin/Debug/net8.0/Sprache.dll

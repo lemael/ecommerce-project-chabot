@@ -42,6 +42,10 @@
               "target": "Package",
               "version": "[8.7.2, )"
             },
+            "DotNetEnv": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.17, )"
