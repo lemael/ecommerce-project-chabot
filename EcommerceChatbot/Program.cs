@@ -3,6 +3,7 @@ using EcommerceChatbot.Services;
 using Microsoft.EntityFrameworkCore;
 using EcommerceChatbot.Models;
 using DotNetEnv;
+using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 
 // Charger les variables d'environnement depuis .env si présent
@@ -37,8 +38,24 @@ var connectionString =
     Environment.GetEnvironmentVariable("DefaultConnection") ??
     builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+// Debug: Affiche la connexion (masque le mot de passe)
+var safeConnectionString = new NpgsqlConnectionStringBuilder(connectionString) {
+    Password = "*****"
+}.ToString();
+Console.WriteLine($"Configuration de connexion utilisée : {safeConnectionString}");
+
+try {
+    builder.Services.AddDbContext<ApplicationDbContext>(options => {
+        options.UseNpgsql(connectionString);
+        options.EnableSensitiveDataLogging(); // Active le logging détaillé
+        options.LogTo(Console.WriteLine, LogLevel.Information); // Log vers la console
+    });
+    
+    Console.WriteLine("Configuration DbContext réussie");
+}
+catch (Exception ex) {
+    Console.WriteLine($"ERREUR DE CONFIGURATION : {ex.ToString()}");
+}
 /*
 builder.Services.AddCors(options =>
 {
