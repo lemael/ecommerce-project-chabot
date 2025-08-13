@@ -4,80 +4,94 @@ using Microsoft.EntityFrameworkCore;
 using EcommerceChatbot.Models;
 using DotNetEnv;
 using Npgsql;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Charger les variables d'environnement depuis .env si présent
 DotNetEnv.Env.Load();
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
+// Configuration CORS unique
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000"
-        ,"https://ecommerce-project-2kvd.onrender.com")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+        policy.WithOrigins(
+                "http://localhost:3000",                   // Développement local
+                "https://ecommerce-project-2kvd.onrender.com"  // Production Render
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
 builder.Services.AddHttpClient<OpenRouterService>();
-/*
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=products.db"));*/
-builder.Configuration
-    .AddEnvironmentVariables();
-// Vérifier ce que Render lit comme chaîne de connexion
-Console.WriteLine("DefaultConnection: " + builder.Configuration.GetConnectionString("DefaultConnection"));
 
-// Utilisation de la connexion
-var connectionString =
-    Environment.GetEnvironmentVariable("DefaultConnection") ??
-    builder.Configuration.GetConnectionString("DefaultConnection");
+// Configuration de la base de données
+builder.Configuration.AddEnvironmentVariables();
 
-// Debug: Affiche la connexion (masque le mot de passe)
-var safeConnectionString = new NpgsqlConnectionStringBuilder(connectionString) {
-    Password = "*****"
-}.ToString();
-Console.WriteLine($"Configuration de connexion utilisée : {safeConnectionString}");
+// Debug: Affiche la configuration de connexion
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
-try {
-    builder.Services.AddDbContext<ApplicationDbContext>(options => {
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("ERREUR: Aucune chaîne de connexion trouvée");
+    throw new Exception("Configuration de base de données manquante");
+}
+
+try 
+{
+    var safeConnectionString = new NpgsqlConnectionStringBuilder(connectionString) 
+    {
+        Password = "*****"
+    }.ToString();
+    Console.WriteLine($"Configuration de connexion utilisée : {safeConnectionString}");
+
+    builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    {
         options.UseNpgsql(connectionString);
-        options.EnableSensitiveDataLogging(); // Active le logging détaillé
-        options.LogTo(Console.WriteLine, LogLevel.Information); // Log vers la console
+        options.EnableSensitiveDataLogging();
+        options.LogTo(Console.WriteLine, LogLevel.Information);
     });
     
     Console.WriteLine("Configuration DbContext réussie");
 }
-catch (Exception ex) {
-    Console.WriteLine($"ERREUR DE CONFIGURATION : {ex.ToString()}");
-}
-/*
-builder.Services.AddCors(options =>
+catch (Exception ex) 
 {
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("https://mon-frontend.onrender.com")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
-*/
-builder.WebHost.UseUrls("http://*:8080");
+    Console.WriteLine($"ERREUR DE CONFIGURATION : {ex}");
+    throw;
+}
 
 var app = builder.Build();
 
 // --- Application des migrations automatiquement ---
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    try 
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        if (db.Database.GetPendingMigrations().Any())
+        {
+            Console.WriteLine("Application des migrations...");
+            db.Database.Migrate();
+            Console.WriteLine("Migrations appliquées avec succès");
+        }
+        
+        if (!db.Database.CanConnect())
+            throw new Exception("Échec de connexion à la base de données");
+        
+        Console.WriteLine("Connexion DB vérifiée");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ERREUR MIGRATION: {ex}");
+        throw;
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -85,62 +99,51 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}else
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-app.MapControllers();
 
-app.UseHttpsRedirection();
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Requête reçue : {context.Request.Path}");
-    await next();
-});
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-app.UseStaticFiles();
-
+// Middlewares dans le bon ordre
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseCors(); // Doit être après UseRouting et avant UseAuthorization
 app.UseAuthorization();
 
-app.MapGet("/form", async () =>
+// Endpoints
+app.MapControllers();
+app.MapGet("/api/test", () => "API fonctionnelle");
+app.MapGet("/debug", async (ApplicationDbContext db) => 
 {
-    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "add-product.html");
-    var html = await File.ReadAllTextAsync(filePath);
-    return Results.Content(html, "text/html");
+    try {
+        return Results.Ok(new {
+            dbStatus = await db.Database.CanConnectAsync(),
+            tables = db.Model.GetEntityTypes().Select(e => e.GetTableName())
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
+// Gestion des produits
+app.MapGet("/products", async (ApplicationDbContext db) =>
+{
+    var products = await db.Products.ToListAsync();
+    return Results.Ok(products);
 });
 
 app.MapPost("/add-product", async (HttpRequest request, ApplicationDbContext db) =>
 {
-   var form = await request.ReadFormAsync();
-   var name = form["name"];
-   var price = decimal.Parse(form["price"]);
-   var quantity = int.Parse(form["quantity"]);
+    var form = await request.ReadFormAsync();
+    var name = form["name"];
+    var price = decimal.Parse(form["price"]);
+    var quantity = int.Parse(form["quantity"]);
     
-   if (string.IsNullOrWhiteSpace(name) || price <= 0 || quantity < 0)
+    if (string.IsNullOrWhiteSpace(name) || price <= 0 || quantity < 0)
     {
         return Results.BadRequest("Données invalides");
     }
@@ -157,30 +160,8 @@ app.MapPost("/add-product", async (HttpRequest request, ApplicationDbContext db)
 
     return Results.Ok("Produit ajouté !");
 });
-app.MapGet("/products", async (ApplicationDbContext db) =>
-{
-    var products = await db.Products.ToListAsync();
-    return Results.Ok(products);
-});
-app.MapGet("/api/products", () => new { message = "Test réussi" });
-app.MapGet("/debug", async (ApplicationDbContext db) => 
-{
-    try {
-        return Results.Ok(new {
-            dbStatus = await db.Database.CanConnectAsync(),
-            tables = db.Model.GetEntityTypes().Select(e => e.GetTableName())
-        });
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-app.UseCors("AllowFrontend");
-app.UseCors();
-app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
+// Démarrer l'application
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+Console.WriteLine($"Démarrage de l'application sur le port {port}");
+app.Run($"http://0.0.0.0:{port}");
