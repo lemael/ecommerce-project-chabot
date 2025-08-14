@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8u8+aL4ep6T40Q1O4Zl41uzkFkvRcfR5X8hvvmsM+BCIft+V0/OrRdndNyVErPKEzHjfnCY5fYs0GfcFdAmFmA==",
+  "dgSpecHash": "cmb0dAsLpAJVlQoxlzFmWThyox3UHWKI2tFtvZYiekkxZm46jP0pz980Se2Fs0PxwG/E2BuQbIcevp+YxGwIcA==",
   "success": true,
-  "projectFilePath": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/EcommerceChatbot.csproj",
+  "projectFilePath": "/home/mael/Dokumente/project/ecommerce-project-chabot/EcommerceChatbot/EcommerceChatbot.csproj",
   "expectedPackageFiles": [
     "/home/mael/.nuget/packages/betalgo.openai/8.7.2/betalgo.openai.8.7.2.nupkg.sha512",
     "/home/mael/.nuget/packages/dotnetenv/3.1.1/dotnetenv.3.1.1.nupkg.sha512",

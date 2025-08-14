@@ -8829,11 +8829,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/EcommerceChatbot.csproj",
+      "projectUniqueName": "/home/mael/Dokumente/project/ecommerce-project-chabot/EcommerceChatbot/EcommerceChatbot.csproj",
       "projectName": "EcommerceChatbot",
-      "projectPath": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/EcommerceChatbot.csproj",
+      "projectPath": "/home/mael/Dokumente/project/ecommerce-project-chabot/EcommerceChatbot/EcommerceChatbot.csproj",
       "packagesPath": "/home/mael/.nuget/packages/",
-      "outputPath": "/home/mael/Dokumente/project/ecommerce-project/EcommerceChatbot/obj/",
+      "outputPath": "/home/mael/Dokumente/project/ecommerce-project-chabot/EcommerceChatbot/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/mael/.nuget/NuGet/NuGet.Config"
